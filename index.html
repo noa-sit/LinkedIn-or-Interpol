@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devine la Plateforme ! (LinkedIn ou Interpol)</title>
+    <style>
+        /* Base et Reset */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5; /* Fond clair et doux */
+            margin: 0;
+            color: #333;
+            /* overflow: hidden; */ /* Retiré pour permettre le défilement si nécessaire sur de très petits écrans */
+        }
+
+        /* Conteneur principal du jeu */
+        .game-container {
+            background-color: #ffffff;
+            padding: 30px; /* Réduit de 40px à 30px */
+            border-radius: 10px; /* Légèrement moins arrondi */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre plus discrète */
+            text-align: center;
+            max-width: 550px; /* Réduit de 650px à 550px */
+            width: 90%;
+            animation: fadeIn 0.7s ease-out; /* Animation légèrement plus rapide */
+            box-sizing: border-box; /* S'assure que le padding est inclus dans la largeur/hauteur */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-15px); } /* Effet d'apparition plus subtil */
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Titre */
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 12px; /* Réduit */
+            font-size: 2.2em; /* Réduit de 2.5em */
+        }
+
+        /* Paragraphe d'instruction */
+        p {
+            font-size: 1em; /* Réduit de 1.1em */
+            color: #555;
+            margin-bottom: 20px; /* Réduit */
+        }
+
+        /* Image de la personnalité */
+        #person-image {
+            width: 120px; /* Réduit de 150px */
+            height: 120px; /* Réduit de 150px */
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 18px; /* Réduit */
+            border: 3px solid #ddd; /* Bordure plus fine */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* Ombre plus petite */
+            display: none; /* Cachée par défaut au chargement */
+        }
+
+        /* Nom de la personnalité */
+        #person-name {
+            font-size: 2.4em; /* Réduit de 2.8em */
+            font-weight: bold;
+            margin: 0px 0 12px; /* Réduit */
+            color: #007bff;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.03); /* Ombre plus légère */
+        }
+
+        /* Indice */
+        #person-hint {
+            font-size: 1.1em; /* Réduit de 1.2em */
+            margin-bottom: 30px; /* Réduit légèrement */
+            font-style: italic;
+            color: #777;
+            min-height: 25px; /* Réduit */
+        }
+
+        /* Conteneur des boutons */
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Réduit de 25px */
+            margin-bottom: 25px; /* Réduit */
+        }
+
+        /* Styles généraux des boutons */
+        button {
+            padding: 12px 30px; /* Réduit de 15px 35px */
+            font-size: 1.2em; /* Réduit de 1.3em */
+            border: none;
+            border-radius: 6px; /* Légèrement moins arrondi */
+            cursor: pointer;
+            transition: all 0.25s ease; /* Transition légèrement plus rapide */
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* Ombre plus petite */
+            letter-spacing: 0.4px; /* Espacement réduit */
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+            background-color: #cccccc; /* Gris pour désactivé */
+            color: #666666; /* Texte gris pour désactivé */
+        }
+        /* Styles spécifiques pour les boutons Interpol et LinkedIn (corrigés pour visibilité) */
+        button#Interpol-btn {
+            background-color: #0056b3; /* Bleu foncé pour Interpol */
+        }
+        button#Interpol-btn:hover:not(:disabled) {
+            background-color: #004085; /* Bleu plus foncé au survol */
+            transform: translateY(-2px) scale(1.01); /* Effet plus subtil */
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15); /* Ombre plus petite */
+        }
+        button#LinkedIn-btn { /* L'ID est "LinkedIn-btn" avec 'l' minuscule */
+            background-color: #0077B5; /* Bleu LinkedIn */
+        }
+        button#LinkedIn-btn:hover:not(:disabled) {
+            background-color: #005f90; /* Bleu plus foncé au survol */
+            transform: translateY(-2px) scale(1.01); /* Effet plus subtil */
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15); /* Ombre plus petite */
+        }
+
+        /* Zone de feedback (Correct/Faux) */
+        #feedback {
+            font-size: 1.4em; /* Réduit de 1.6em */
+            font-weight: bold;
+            margin-top: 20px; /* Réduit */
+            min-height: 35px; /* Réduit */
+            color: #333;
+        }
+        /* Les couleurs de feedback ne changent pas, elles sont efficaces */
+        #feedback.correct {
+            color: #28a745;
+        }
+        #feedback.wrong {
+            color: #dc3545;
+        }
+
+        /* Lien vers la plateforme */
+        #platform-link {
+            margin-top: 12px; /* Réduit */
+            font-size: 1em; /* Réduit de 1.1em */
+            font-weight: bold;
+            min-height: 20px; /* Réduit */
+            display: none; /* Caché par défaut */
+        }
+        #platform-link a {
+            text-decoration: none;
+            transition: color 0.25s ease;
+        }
+        #platform-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Affichage du score */
+        #score {
+            font-size: 1.2em; /* Réduit de 1.3em */
+            margin-top: 20px; /* Réduit */
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        /* Bouton "Personnalité suivante" */
+        #next-person-btn {
+            background-color: #17a2b8;
+            margin-top: 25px; /* Réduit */
+            padding: 10px 20px; /* Réduit de 12px 25px */
+            font-size: 1em; /* Réduit de 1.1em */
+            display: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Ombre plus petite */
+        }
+        #next-person-btn:hover:not(:disabled) {
+            background-color: #138496;
+            transform: translateY(-1px); /* Effet plus subtil */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12); /* Ombre plus petite */
+        }
+
+        /* Media Queries pour la responsivité : ajustements supplémentaires pour petits écrans */
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+                max-width: 95%; /* Prend plus de largeur sur les petits écrans */
+            }
+            h1 {
+                font-size: 2em;
+            }
+            p {
+                font-size: 0.9em;
+                margin-bottom: 15px;
+            }
+            #person-image {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 15px;
+                border-width: 2px;
+            }
+            #person-name {
+                font-size: 2em;
+            }
+            #person-hint {
+                font-size: 0.95em;
+                margin-bottom: 20px;
+            }
+            .buttons-container {
+                flex-direction: column; /* Boutons empilés verticalement */
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 1.1em;
+                max-width: 100%; /* Prend toute la largeur disponible */
+            }
+            #feedback {
+                font-size: 1.2em;
+                min-height: 30px;
+            }
+            #score {
+                font-size: 1em;
+            }
+            #next-person-btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Devine la Plateforme !</h1>
+        <p>Sur quelle plateforme cette personnalité est-elle principalement connue ?</p>
+        <img id="person-image" src="" alt="Photo de la personnalité">
+        <div id="person-name">Chargement...</div>
+        <div id="person-hint"></div>
+
+        <div class="buttons-container">
+            <button id="Interpol-btn">Interpol</button>
+            <button id="LinkedIn-btn">LinkedIn</button>
+        </div>
+
+        <div id="feedback"></div>
+        <div id="platform-link"></div>
+        <div id="score">Score : 0 / 0</div>
+
+        <button id="next-person-btn">Personnalité suivante</button>
+    </div>
+
+    <script src="personalities.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
